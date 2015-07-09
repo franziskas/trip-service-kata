@@ -13,6 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 public class TripServiceShould {
+    private static final List<Trip> TRIPS = asList(new Trip(), new Trip());
     @Rule
     public ExpectedException thrown = ExpectedException.none();
     private User loggedInUser;
@@ -28,7 +29,7 @@ public class TripServiceShould {
 
             @Override
             protected List<Trip> getTripsBy(User user) {
-                return asList(new Trip(), new Trip());
+                return TRIPS;
             }
         };
     }
@@ -52,5 +53,17 @@ public class TripServiceShould {
         List<Trip> trips = tripService.getTripsByUser(bob);
 
         assertThat(trips.size(), is(0));
+    }
+
+    @Test
+    public void
+    show_trips_if_logged_in_user_is_friends_with_user() {
+        loggedInUser = new User();
+        User bob = new User();
+        bob.addFriend(loggedInUser);
+
+        List<Trip> trips = tripService.getTripsByUser(bob);
+
+        assertThat(trips, is(TRIPS));
     }
 }
