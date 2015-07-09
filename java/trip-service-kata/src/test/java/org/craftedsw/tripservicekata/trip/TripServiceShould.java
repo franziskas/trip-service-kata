@@ -24,13 +24,13 @@ public class TripServiceShould {
 
     @Before
     public void initialise() {
-        tripService = new TripService() {
+        tripService = new TripService(new TripDAO() {
 
             @Override
-            protected List<Trip> getTripsBy(User user) {
+            public List<Trip> findTripsBy(User user) {
                 return TRIPS;
             }
-        };
+        });
     }
 
     @Test

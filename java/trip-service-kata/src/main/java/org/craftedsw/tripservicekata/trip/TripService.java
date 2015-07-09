@@ -7,6 +7,11 @@ import org.craftedsw.tripservicekata.user.User;
 import static java.util.Collections.emptyList;
 
 public class TripService {
+    private TripDAO tripDAO;
+
+    public TripService(TripDAO tripDAO) {
+        this.tripDAO = tripDAO;
+    }
 
     public List<Trip> getTripsByUser(User user, User loggedInUser) throws UserNotLoggedInException {
         if (loggedInUser == null) {
@@ -17,12 +22,10 @@ public class TripService {
             return getTripsBy(user);
         }
         return emptyList();
-
-
     }
 
     protected List<Trip> getTripsBy(User user) {
-        return TripDAO.findTripsByUser(user);
+        return tripDAO.findTripsBy(user);
     }
-    
+
 }
