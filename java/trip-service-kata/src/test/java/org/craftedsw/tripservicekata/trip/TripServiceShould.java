@@ -49,6 +49,7 @@ public class TripServiceShould {
     show_no_trips_if_logged_in_user_is_not_friends_with_user() {
         loggedInUser = new User();
         User bob = new User();
+        bob.addFriend(new User());
 
         List<Trip> trips = tripService.getTripsByUser(bob);
 
