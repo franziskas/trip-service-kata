@@ -14,18 +14,17 @@ import static org.hamcrest.core.Is.is;
 
 public class TripServiceShould {
     private static final List<Trip> TRIPS = asList(new Trip(), new Trip());
+    public static final User ALICE = new User();
+    private static final User NO_LOGGED_IN_USER = null;
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-    private User loggedInUser;
+
     private TripService tripService;
 
     @Before
     public void initialise() {
         tripService = new TripService() {
-            @Override
-            protected User getLoggedInUser() {
-                return loggedInUser;
-            }
 
             @Override
             protected List<Trip> getTripsBy(User user) {
@@ -37,21 +36,18 @@ public class TripServiceShould {
     @Test
     public void
     throw_exception_if_user_is_not_logged_in() {
-        loggedInUser = null;
-
         thrown.expect(UserNotLoggedInException.class);
 
-        tripService.getTripsByUser(null);
+        tripService.getTripsByUser(ALICE, NO_LOGGED_IN_USER);
     }
 
     @Test
     public void
     show_no_trips_if_logged_in_user_is_not_friends_with_user() {
-        loggedInUser = new User();
         User bob = new User();
         bob.addFriend(new User());
 
-        List<Trip> trips = tripService.getTripsByUser(bob);
+        List<Trip> trips = tripService.getTripsByUser(bob, ALICE);
 
         assertThat(trips.size(), is(0));
     }
@@ -59,11 +55,10 @@ public class TripServiceShould {
     @Test
     public void
     show_trips_if_logged_in_user_is_friends_with_user() {
-        loggedInUser = new User();
         User bob = new User();
-        bob.addFriend(loggedInUser);
+        bob.addFriend(ALICE);
 
-        List<Trip> trips = tripService.getTripsByUser(bob);
+        List<Trip> trips = tripService.getTripsByUser(bob, ALICE);
 
         assertThat(trips, is(TRIPS));
     }
