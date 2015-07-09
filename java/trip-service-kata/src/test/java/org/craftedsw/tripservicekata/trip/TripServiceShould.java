@@ -3,6 +3,7 @@ package org.craftedsw.tripservicekata.trip;
 import java.util.List;
 import org.craftedsw.tripservicekata.exception.UserNotLoggedInException;
 import org.craftedsw.tripservicekata.user.User;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -14,16 +15,28 @@ import static org.hamcrest.core.Is.is;
 public class TripServiceShould {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+    private User loggedInUser;
+    private TripService tripService;
+
+    @Before
+    public void initialise() {
+        tripService = new TripService() {
+            @Override
+            protected User getLoggedInUser() {
+                return loggedInUser;
+            }
+
+            @Override
+            protected List<Trip> getTripsBy(User user) {
+                return asList(new Trip(), new Trip());
+            }
+        };
+    }
 
     @Test
     public void
     throw_exception_if_user_is_not_logged_in() {
-        TripService tripService = new TripService() {
-            @Override
-            protected User getLoggedInUser() {
-                return null;
-            }
-        };
+        loggedInUser = null;
 
         thrown.expect(UserNotLoggedInException.class);
 
@@ -33,19 +46,8 @@ public class TripServiceShould {
     @Test
     public void
     show_no_trips_if_logged_in_user_is_not_friends_with_user() {
+        loggedInUser = new User();
         User bob = new User();
-        final User alice = new User();
-        TripService tripService = new TripService() {
-            @Override
-            protected User getLoggedInUser() {
-                return alice;
-            }
-
-            @Override
-            protected List<Trip> getTripsBy(User user) {
-                return asList(new Trip(), new Trip());
-            }
-        };
 
         List<Trip> trips = tripService.getTripsByUser(bob);
 
